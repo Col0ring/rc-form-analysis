@@ -20,7 +20,7 @@ import {
   getParams,
   isEmptyObject,
   flattenArray,
-  supportRef
+  supportRef,
 } from './utils';
 import FieldElemWrapper from './FieldElemWrapper';
 
@@ -182,6 +182,7 @@ function createBaseForm(option = {}, mixins = []) {
 
       getFieldDecorator(name, fieldOption) {
         const props = this.getFieldProps(name, fieldOption);
+        // 包装高阶组件
         return fieldElem => {
           // We should put field in record if it is rendered
           this.renderFields[name] = true;
@@ -324,6 +325,11 @@ function createBaseForm(option = {}, mixins = []) {
         return flattenArray(actionRules);
       },
 
+      /**
+       * set Fields 时会强制刷新 form 表单
+       * @param {*} maybeNestedFields
+       * @param {*} callback
+       */
       setFields(maybeNestedFields, callback) {
         const fields = this.fieldsStore.flattenRegisteredFields(
           maybeNestedFields,
