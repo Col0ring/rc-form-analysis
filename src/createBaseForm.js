@@ -43,11 +43,13 @@ function createBaseForm(option = {}, mixins = []) {
   } = option;
 
   return function decorate(WrappedComponent) {
+    // 使用 createReactClass 和 mixins 创建的 Form 表单，历史产物
     const Form = createReactClass({
       mixins,
 
       getInitialState() {
         const fields = mapPropsToFields && mapPropsToFields(this.props);
+        // 保存 fields 相关信息的 store
         this.fieldsStore = createFieldsStore(fields || {});
 
         this.instances = {};
@@ -130,6 +132,12 @@ function createBaseForm(option = {}, mixins = []) {
         return { name, field: { ...field, value, touched: true }, fieldMeta };
       },
 
+      /**
+       * onChange 回调
+       * @param {*} name_
+       * @param {*} action
+       * @param  {...any} args
+       */
       onCollect(name_, action, ...args) {
         const { name, field, fieldMeta } = this.onCollectCommon(
           name_,
@@ -166,6 +174,9 @@ function createBaseForm(option = {}, mixins = []) {
         });
       },
 
+      /**
+       * 绑定表单域的触发函数
+       */
       getCacheBind(name, action, fn) {
         if (!this.cachedBind[name]) {
           this.cachedBind[name] = {};
@@ -180,6 +191,12 @@ function createBaseForm(option = {}, mixins = []) {
         return cache[action].fn;
       },
 
+      /**
+       * 高阶函数，返回一个被包装过的 Field 组件
+       * @param {*} name
+       * @param {*} fieldOption
+       * @returns
+       */
       getFieldDecorator(name, fieldOption) {
         const props = this.getFieldProps(name, fieldOption);
         // 包装高阶组件
@@ -209,6 +226,7 @@ function createBaseForm(option = {}, mixins = []) {
           }
           fieldMeta.originalProps = originalProps;
           fieldMeta.ref = fieldElem.ref;
+          // 传入 props
           const decoratedFieldElem = React.cloneElement(fieldElem, {
             ...props,
             ...this.fieldsStore.getFieldValuePropValue(fieldMeta),
@@ -223,6 +241,12 @@ function createBaseForm(option = {}, mixins = []) {
         };
       },
 
+      /**
+       * 表单项相关 props
+       * @param {*} name
+       * @param {*} usersFieldOption
+       * @returns
+       */
       getFieldProps(name, usersFieldOption = {}) {
         if (!name) {
           throw new Error('Must call `getFieldProps` with valid name string!');
@@ -372,6 +396,7 @@ function createBaseForm(option = {}, mixins = []) {
           }
           return acc;
         }, {});
+        // 改变 fields，刷新页面
         this.setFields(newFields, callback);
         if (onValuesChange) {
           const allValues = this.fieldsStore.getAllValues();

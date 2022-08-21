@@ -3,7 +3,9 @@ import warning from 'warning';
 import { isMemo } from 'react-is';
 
 function getDisplayName(WrappedComponent) {
-  return WrappedComponent.displayName || WrappedComponent.name || 'WrappedComponent';
+  return (
+    WrappedComponent.displayName || WrappedComponent.name || 'WrappedComponent'
+  );
 }
 
 export function argumentContainer(Container, WrappedComponent) {
@@ -21,20 +23,29 @@ export function flattenArray(arr) {
   return Array.prototype.concat.apply([], arr);
 }
 
-export function treeTraverse(path = '', tree, isLeafNode, errorMessage, callback) {
+export function treeTraverse(
+  path = '',
+  tree,
+  isLeafNode,
+  errorMessage,
+  callback,
+) {
   if (isLeafNode(path, tree)) {
     callback(path, tree);
   } else if (tree === undefined || tree === null) {
     // Do nothing
   } else if (Array.isArray(tree)) {
-    tree.forEach((subTree, index) => treeTraverse(
-      `${path}[${index}]`,
-      subTree,
-      isLeafNode,
-      errorMessage,
-      callback
-    ));
-  } else { // It's object and not a leaf node
+    tree.forEach((subTree, index) =>
+      treeTraverse(
+        `${path}[${index}]`,
+        subTree,
+        isLeafNode,
+        errorMessage,
+        callback,
+      ),
+    );
+  } else {
+    // It's object and not a leaf node
     if (typeof tree !== 'object') {
       warning(false, errorMessage);
       return;
@@ -46,7 +57,7 @@ export function treeTraverse(path = '', tree, isLeafNode, errorMessage, callback
         subTree,
         isLeafNode,
         errorMessage,
-        callback
+        callback,
       );
     });
   }
@@ -54,14 +65,20 @@ export function treeTraverse(path = '', tree, isLeafNode, errorMessage, callback
 
 export function flattenFields(maybeNestedFields, isLeafNode, errorMessage) {
   const fields = {};
-  treeTraverse(undefined, maybeNestedFields, isLeafNode, errorMessage, (path, node) => {
-    fields[path] = node;
-  });
+  treeTraverse(
+    undefined,
+    maybeNestedFields,
+    isLeafNode,
+    errorMessage,
+    (path, node) => {
+      fields[path] = node;
+    },
+  );
   return fields;
 }
 
 export function normalizeValidateRules(validate, rules, validateTrigger) {
-  const validateRules = validate.map((item) => {
+  const validateRules = validate.map(item => {
     const newItem = {
       ...item,
       trigger: item.trigger || [],
@@ -98,7 +115,7 @@ export function getValueFromEvent(e) {
 
 export function getErrorStrs(errors) {
   if (errors) {
-    return errors.map((e) => {
+    return errors.map(e => {
       if (e && e.message) {
         return e.message;
       }
@@ -143,7 +160,7 @@ export function isEmptyObject(obj) {
 
 export function hasRules(validate) {
   if (validate) {
-    return validate.some((item) => {
+    return validate.some(item => {
       return item.rules && item.rules.length;
     });
   }
@@ -160,7 +177,10 @@ export function supportRef(nodeOrComponent) {
     : nodeOrComponent.type;
 
   // Function component node
-  if (typeof type === 'function' && !(type.prototype && type.prototype.render)) {
+  if (
+    typeof type === 'function' &&
+    !(type.prototype && type.prototype.render)
+  ) {
     return false;
   }
 

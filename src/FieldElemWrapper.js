@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+/**
+ * 做相关 effect 处理
+ */
 export default class FieldElemWrapper extends React.Component {
   componentDidMount() {
     const { name, form } = this.props;
